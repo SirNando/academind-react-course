@@ -1,7 +1,7 @@
-import Expenses from "./components/Expenses";
+import Expenses from "./components/Expenses/Expenses";
 import "./App.css";
 
-function App() {
+const App = () => {
   const expenses = [
     {
       id: "e1",
@@ -26,7 +26,7 @@ function App() {
 
   return (
     <div>
-      <h2>Let's go!</h2>
+      <h2>Go!</h2>
       <Expenses expenses={expenses} />
     </div>
   );

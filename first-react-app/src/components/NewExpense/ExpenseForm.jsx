@@ -6,12 +6,6 @@ const ExpenseForm = (props) => {
   const [enteredAmount, setEnteredAmount] = useState("");
   const [enteredDate, setEnteredDate] = useState("");
 
-  const [userInput, setUserInput] = useState({
-    enteredTitle: "",
-    enteredAmount: "",
-    enteredDate: "",
-  });
-
   const titleChangeHandler = (event) => {
     setEnteredTitle(event.target.value);
   };
@@ -24,18 +18,10 @@ const ExpenseForm = (props) => {
     setEnteredDate(event.target.value);
   };
 
-  const inputChangeHandler = (identifier, value) => {
-    if (identifier === "title") {
-      setEnteredTitle(value);
-    } else if (identifier === "amount") {
-      setEnteredAmount(value);
-    } else {
-      setEnteredDate(value);
-    }
-  };
-
   const sumbitHandler = (event) => {
     event.preventDefault();
+
+    setHideForm(!hideForm);
 
     const expenseData = {
       title: enteredTitle,
@@ -50,6 +36,16 @@ const ExpenseForm = (props) => {
     setEnteredAmount("");
     setEnteredDate("");
   };
+
+  const [hideForm, setHideForm] = useState(true);
+
+  const hideFormHandler = () => {
+    setHideForm(!hideForm);
+  };
+
+  if (hideForm) {
+    return <button onClick={hideFormHandler}>Add New Expense</button>;
+  }
 
   return (
     <form onSubmit={sumbitHandler}>
@@ -84,7 +80,12 @@ const ExpenseForm = (props) => {
         </div>
       </div>
       <div className="new-expense__actions">
-        <button type="sumbit">Add Expense</button>
+        <button type="reset" onClick={hideFormHandler}>
+          Cancel
+        </button>
+        <button type="sumbit">
+          Add Expense
+        </button>
       </div>
     </form>
   );

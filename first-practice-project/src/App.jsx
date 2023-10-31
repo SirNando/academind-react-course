@@ -33,11 +33,13 @@ function App() {
     }
 
     // do something with yearlyData ...
+    return yearlyData;
   };
 
   const [tableData, setTableData] = useState([]);
   function tableChangeHandler(event) {
-    setTableData([...tableData, event]);
+    const data = calculateHandler(event);
+    setTableData([...tableData, ...data]);
   }
 
   // Log the updated tableData in the next render cycle
@@ -59,7 +61,7 @@ function App() {
       {/* Todo: Show below table conditionally (only once result data is available) */}
       {/* Show fallback text if no data is available */}
 
-      <Table tableFieldsData={tableFieldsData}></Table>
+      <Table tableFieldsData={tableFieldsData} tableData={tableData}></Table>
     </>
   );
 }

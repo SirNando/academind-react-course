@@ -1,5 +1,10 @@
 const Table = (props) => {
   const tableFields = props.tableFieldsData;
+  const tableData = props.tableData;
+
+  if(props.tableData.length === 0) {
+    return(<h1>Nothing to see here.</h1>)
+  }
 
   return (
     <table className="result">
@@ -11,11 +16,17 @@ const Table = (props) => {
         </tr>
       </thead>
       <tbody>
-        <tr>
-          {tableFields.body.map((bodyElement, key) => {
-            return <td key={key}>{bodyElement}</td>;
-          })}
-        </tr>
+        {tableData.map((entry, key) => {
+          return (
+            <tr key={key}>
+              <td>{entry["year"]}</td>
+              <td>{entry.yearlyInterest + entry.savingsEndOfYear}</td>
+              <td>{entry.yearlyInterest}</td>
+              <td>{entry.savingsEndOfYear}</td>
+              <td>{entry.yearlyContribution}</td>
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   );

@@ -3,8 +3,7 @@ import logo from "./assets/investment-calculator-logo.png";
 import InputForm from "./Templates/InputForm";
 import Table from "./Templates/Table";
 import { tableFieldsData } from "./Data/TableData";
-import { useEffect, useState } from "react";
-/* Data */
+import { useState } from "react";
 import { buttonLabels, inputFormLabels } from "./Data/FormLabelData";
 
 function App() {
@@ -42,10 +41,6 @@ function App() {
     setTableData([...tableData, ...data]);
   }
 
-  // Log the updated tableData in the next render cycle
-  useEffect(() => {
-    console.log(tableData);
-  }, [tableData]);
   return (
     <>
       <header className="header">
@@ -57,10 +52,6 @@ function App() {
         buttonLabels={buttonLabels}
         insertData={tableChangeHandler}
       />
-
-      {/* Todo: Show below table conditionally (only once result data is available) */}
-      {/* Show fallback text if no data is available */}
-
       <Table tableFieldsData={tableFieldsData} tableData={tableData}></Table>
     </>
   );

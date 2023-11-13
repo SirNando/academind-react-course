@@ -1,9 +1,9 @@
 import Input from "../Organisms/Forms/Input";
 import InputGroup from "../Organisms/Forms/InputGroup";
 import FormActions from "../Organisms/Forms/FormActions";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-const InputForm = (props) => {
+export default function InputForm(props) {
   const labelData = props.labelData;
   const buttonLabels = props.buttonLabels;
 
@@ -23,11 +23,6 @@ const InputForm = (props) => {
     event.preventDefault();
     props.insertData(formData);
   }
-
-  // Log the updated formData in the next render cycle
-  /* useEffect(() => {
-    console.log(formData);
-  }, [formData]); */
 
   return (
     <form className="form" onSubmit={submitHandler}>
@@ -66,6 +61,4 @@ const InputForm = (props) => {
       ></FormActions>
     </form>
   );
-};
-
-export default InputForm;
+}

@@ -1,9 +1,9 @@
-const Table = (props) => {
+export default function Table(props) {
   const tableFields = props.tableFieldsData;
   const tableData = props.tableData;
 
-  if(props.tableData.length === 0) {
-    return(<h1>Nothing to see here.</h1>)
+  if (props.tableData.length === 0) {
+    return <h1>Nothing to see here.</h1>;
   }
 
   return (
@@ -30,6 +30,4 @@ const Table = (props) => {
       </tbody>
     </table>
   );
-};
-
-export default Table;
+}

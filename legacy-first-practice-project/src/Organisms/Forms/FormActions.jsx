@@ -1,4 +1,4 @@
-const FormActions = (props) => {
+export default function FormActions(props) {
   return (
     <p className="actions">
       <button type="reset" className="buttonAlt">
@@ -9,6 +9,4 @@ const FormActions = (props) => {
       </button>
     </p>
   );
-};
-
-export default FormActions;
+}

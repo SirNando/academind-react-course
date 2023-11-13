@@ -1,4 +1,4 @@
-const Input = (props) => {
+export default function Input(props) {
   return (
     <p>
       <label htmlFor={props.id}>{props.children}</label>
@@ -11,5 +11,3 @@ const Input = (props) => {
     </p>
   );
 };
-
-export default Input;

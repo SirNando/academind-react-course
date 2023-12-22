@@ -1,26 +1,28 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import Root from "./Root";
-import Home from "./pages/Home";
-import Events, { eventsLoader } from "./pages/Events";
-import EventDetail, {
-  deleteEventAction,
-  eventDetailLoader,
-} from "./pages/EventDetail";
-import NewEvent, { newEventAction } from "./pages/NewEvent";
-import EditEvent from "./pages/EditEvent";
-import EventsRoot from "./EventsRoot";
-import Error from "./pages/Error";
 
-const routes = createBrowserRouter([
+import Root from "./Root";
+import Error from "./pages/Error";
+import Home from "./pages/Home";
+import EventsRoot from "./EventsRoot";
+import Events, { loader as eventsLoader } from "./pages/Events";
+import EventDetail, {
+  eventDetailLoader,
+  deleteEventAction,
+} from "./pages/EventDetail";
+import EditEvent from "./pages/EditEvent";
+import { action as manipulateEventAction } from "./components/EventForm";
+import NewEvent from "./pages/NewEvent";
+import Newsletter, {
+  action as newsletterAction,
+} from "./components/Newsletter";
+
+const router = createBrowserRouter([
   {
     path: "/",
     element: <Root />,
     errorElement: <Error />,
     children: [
-      {
-        index: true,
-        element: <Home />,
-      },
+      { index: true, element: <Home /> },
       {
         path: "events",
         element: <EventsRoot />,
@@ -43,22 +45,28 @@ const routes = createBrowserRouter([
               {
                 path: "edit",
                 element: <EditEvent />,
+                action: manipulateEventAction,
               },
             ],
           },
           {
             path: "new",
             element: <NewEvent />,
-            action: newEventAction,
+            action: manipulateEventAction,
           },
         ],
+      },
+      {
+        path: "newsletter",
+        element: <Newsletter />,
+        action: newsletterAction,
       },
     ],
   },
 ]);
 
 function App() {
-  return <RouterProvider router={routes} />;
+  return <RouterProvider router={router} />;
 }
 
 export default App;

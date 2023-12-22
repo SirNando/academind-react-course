@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import { json, useLoaderData } from "react-router";
+import { Await, defer, json, useLoaderData } from "react-router";
 
 import EventsList from "../components/EventsList";
+import { Suspense } from "react";
 
-export async function eventsLoader() {
+async function loadEvents() {
   const response = await fetch("http://localhost:8080/events");
 
   if (!response.ok) {
@@ -15,21 +15,26 @@ export async function eventsLoader() {
     ); */
     throw json({ message: "Could not fetch events." }, { status: 500 });
   } else {
-    return response;
+    const repsonseData = await response.json();
+    return repsonseData.events;
   }
 }
 
-function EventsPage() {
-  const data = useLoaderData();
-  if (data.isError) {
-    return <p>{data.message}</p>;
-  }
+export function loader() {
+  return defer({
+    events: loadEvents(),
+  });
+}
 
-  const events = data.events;
+function EventsPage() {
+  const { events } = useLoaderData();
+
   return (
-    <>
-      <EventsList events={events} />
-    </>
+    <Suspense fallback={<p style={{ textAlign: "center" }}>Loading...</p>}>
+      <Await resolve={events}>
+        {(loadedEvents) => <EventsList events={loadedEvents} />}
+      </Await>
+    </Suspense>
   );
 }
 

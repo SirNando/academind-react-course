@@ -1,15 +1,70 @@
-import { Form, useNavigate } from "react-router-dom";
+import {
+  Form,
+  useActionData,
+  useNavigate,
+  useNavigation,
+  json,
+  redirect,
+} from "react-router-dom";
 
 import classes from "./EventForm.module.css";
 
-function EventForm({ method, event }) {
-  const navigate = useNavigate();
-  function cancelHandler() {
-    // ...
+export async function action({ request, params }) {
+  const method = request.method;
+  const data = await request.formData();
+
+  const eventData = {
+    title: data.get("title"),
+    image: data.get("image"),
+    date: data.get("date"),
+    description: data.get("description"),
+  };
+
+  let url = "http://localhost:8080/events";
+  if (method === "PATCH") {
+    const eventId = params.id;
+    url += "/" + eventId;
   }
 
+  const response = await fetch(url, {
+    method: method,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(eventData),
+  });
+
+  if (response.status === 422) {
+    return response;
+  }
+
+  if (!response.ok) {
+    throw json({ message: "Could not save event" }, { status: 500 });
+  }
+
+  return redirect("/events");
+}
+
+function EventForm({ method, event }) {
+  const data = useActionData();
+  const navigate = useNavigate();
+  const navigation = useNavigation();
+
+  function cancelHandler() {
+    navigate("..");
+  }
+
+  const isSubmitting = navigation.state === "submitting";
+
   return (
-    <Form className={classes.form} method="post">
+    <Form className={classes.form} method={method}>
+      {data && data.errors && (
+        <ul>
+          {Object.values(data.errors).map((error) => (
+            <li key={error}>{error}</li>
+          ))}
+        </ul>
+      )}
       <p>
         <label htmlFor="title">Title</label>
         <input
@@ -51,10 +106,12 @@ function EventForm({ method, event }) {
         />
       </p>
       <div className={classes.actions}>
-        <button type="button" onClick={cancelHandler}>
+        <button type="button" onClick={cancelHandler} disabled={isSubmitting}>
           Cancel
         </button>
-        <button>Save</button>
+        <button disabled={isSubmitting}>
+          {isSubmitting ? "Saving..." : "Save"}
+        </button>
       </div>
     </Form>
   );

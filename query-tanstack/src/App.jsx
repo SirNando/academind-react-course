@@ -4,6 +4,7 @@ import {
   createBrowserRouter,
 } from "react-router-dom";
 
+import { queryClient } from "./util/http.js";
 import Events from "./components/Events/Events.jsx";
 import EventDetails from "./components/Events/EventDetails.jsx";
 import NewEvent from "./components/Events/NewEvent.jsx";
@@ -37,8 +38,6 @@ const router = createBrowserRouter([
     ],
   },
 ]);
-
-const queryClient = new QueryClient();
 
 function App() {
   return (

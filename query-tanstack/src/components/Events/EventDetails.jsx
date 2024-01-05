@@ -4,14 +4,18 @@ import Header from "../Header.jsx";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { deleteEvent, fetchEvent, queryClient } from "../../util/http.js";
 import ErrorBlock from "../UI/ErrorBlock.jsx";
+import { useState } from "react";
+import Modal from "../UI/Modal.jsx";
 
 export default function EventDetails() {
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const navigate = useNavigate();
   const { id } = useParams();
 
   // We first get the data for the specific event
-  const { data, isPending, isError, error } = useQuery({
-    queryKey: ["event-details", { id: id }],
+  const { data, isPending, isError } = useQuery({
+    queryKey: ["events", id],
     queryFn: ({ signal }) => fetchEvent({ id, signal }),
   });
 
@@ -25,10 +29,19 @@ export default function EventDetails() {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["events"],
+        refetchType: "none",
       });
       navigate("/events");
     },
   });
+
+  function handleStartDelete() {
+    setIsDeleting(true);
+  }
+
+  function handleStopDelete() {
+    setIsDeleting(false);
+  }
 
   function handleDelete() {
     mutate();
@@ -49,7 +62,7 @@ export default function EventDetails() {
       <div id="event-details-content" className="center">
         <ErrorBlock
           title="There was an error trying to delete"
-          message={deleteError.info?.message || "Please try again."}
+          message={deleteError?.info?.message || "Please try again."}
         />
       </div>
     );
@@ -66,13 +79,10 @@ export default function EventDetails() {
       <>
         <header>
           <h1>{data.title}</h1>
-          {deleteIsPending && <p>Deleting...</p>}
-          {!deleteIsPending && (
-            <nav>
-              <button onClick={handleDelete}>Delete</button>
-              <Link to="edit">Edit</Link>
-            </nav>
-          )}
+          <nav>
+            <button onClick={handleStartDelete}>Delete</button>
+            <Link to="edit">Edit</Link>
+          </nav>
         </header>
         <div id="event-details-content">
           <img src={`http://localhost:3000/${data.image}`} alt="" />
@@ -92,6 +102,36 @@ export default function EventDetails() {
 
   return (
     <>
+      {isDeleting && (
+        <Modal onClose={handleStopDelete}>
+          <h2>Are you sure?</h2>
+          <p>
+            Do you really want to delete this event? This action cannot be
+            undone
+          </p>
+          <div className="form-actions">
+            <button
+              onClick={handleStopDelete}
+              className="button-text"
+              disabled={deleteIsPending}
+            >
+              Cancel
+            </button>
+            <button onClick={handleDelete} className="button">
+              {deleteIsPending ? "Deleting..." : "Delete"}
+            </button>
+          </div>
+          {deleteIsError && (
+            <ErrorBlock
+              title="Failed to delete the event"
+              message={
+                deleteError?.info?.message ||
+                "Failed to delete event, please try again later."
+              }
+            />
+          )}
+        </Modal>
+      )}
       <Outlet />
       <Header>
         <Link to="/events" className="nav-item">

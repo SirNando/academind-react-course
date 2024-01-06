@@ -1,22 +1,48 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
+import {
+  Link,
+  redirect,
+  useNavigate,
+  useNavigation,
+  useParams,
+  useSubmit,
+} from "react-router-dom";
 
 import Modal from "../UI/Modal.jsx";
 import EventForm from "./EventForm.jsx";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { fetchEvent, queryClient, updateEvent } from "../../util/http.js";
-import LoadingIndicator from "../UI/LoadingIndicator.jsx";
 import ErrorBlock from "../UI/ErrorBlock.jsx";
 
-export default function EditEvent() {
-  const navigate = useNavigate();
-  const { id } = useParams();
-
-  const { data, isPending, isError, error } = useQuery({
+export function loader({ params }) {
+  const id = params.id;
+  return queryClient.fetchQuery({
     queryKey: ["events", id],
     queryFn: ({ signal }) => fetchEvent({ signal, id }),
   });
+}
 
-  const { mutate } = useMutation({
+export async function action({ request, params }) {
+  const formData = await request.formData();
+  const updatedEventData = Object.fromEntries(formData);
+  await updateEvent({ id: params.id, event: updatedEventData });
+  await queryClient.invalidateQueries(["events"]);
+  return redirect("../");
+}
+
+export default function EditEvent() {
+  const navigate = useNavigate();
+  const { state } = useNavigation();
+  const submit = useSubmit();
+  const { id } = useParams();
+
+  // The hook is kept here but the data from the loader stays cached
+  const { data, isPending, isError, error } = useQuery({
+    queryKey: ["events", id],
+    queryFn: ({ signal }) => fetchEvent({ signal, id }),
+    staleTime: 10000, // So that we don't immediately send another request after the loader does
+  });
+
+  /*   const { mutate } = useMutation({
     mutationFn: updateEvent,
     onMutate: async (data) => {
       const newEvent = data.event;
@@ -34,11 +60,10 @@ export default function EditEvent() {
     onSettled: () => {
       queryClient.invalidateQueries(["events", id]);
     },
-  });
+  }); */
 
   function handleSubmit(formData) {
-    mutate({ id, event: formData });
-    navigate("../");
+    submit(formData, { method: "PUT" });
   }
 
   function handleClose() {
@@ -46,14 +71,6 @@ export default function EditEvent() {
   }
 
   let content;
-
-  if (isPending) {
-    content = (
-      <div className="center">
-        <LoadingIndicator />
-      </div>
-    );
-  }
 
   if (isError) {
     content = (
@@ -76,12 +93,18 @@ export default function EditEvent() {
   if (data) {
     content = (
       <EventForm inputData={data} onSubmit={handleSubmit}>
-        <Link to="../" className="button-text">
-          Cancel
-        </Link>
-        <button type="submit" className="button">
-          Update
-        </button>
+        {state === "submitting" ? (
+          <p>Submitting data...</p>
+        ) : (
+          <>
+            <Link to="../" className="button-text">
+              Cancel
+            </Link>
+            <button type="submit" className="button">
+              Update
+            </button>
+          </>
+        )}
       </EventForm>
     );
   }

@@ -3,6 +3,19 @@ import classes from "./page.module.css";
 import { getMeal } from "@/lib/meals";
 import { notFound } from "next/navigation";
 
+export async function generateMetadata({ params }) {
+  const meal = getMeal(params.mealSlug);
+
+  if (!meal) {
+    notFound();
+  }
+
+  return {
+    title: meal.title,
+    description: meal.summary,
+  };
+}
+
 export default function MealDetails({ params }) {
   const meal = getMeal(params.mealSlug);
 
@@ -15,7 +28,7 @@ export default function MealDetails({ params }) {
     <>
       <header className={classes.header}>
         <div className={classes.image}>
-          <Image fill src={meal.image} />
+          <Image fill src={meal.image} alt={meal.summary} />
         </div>
         <div className={classes.headerText}>
           <h1>{meal.title}</h1>

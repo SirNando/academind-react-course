@@ -5,7 +5,6 @@ import Card from "../UI/Card";
 import "./ProductItem.css";
 
 const ProductItem = memo((props) => {
-  console.log("RENDERING");
   const dispatch = useStore(false)[1];
   const toggleFavHandler = () => {
     dispatch("TOGGLE_FAV", props.id);
